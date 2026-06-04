@@ -272,6 +272,37 @@ h2 {
   text-decoration: none;
 }
 
+.masthead-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.language-switch {
+  display: inline-flex;
+  min-height: 44px;
+  overflow: hidden;
+  border: 1px solid var(--line-hot);
+  border-radius: 8px;
+  background: rgba(255, 111, 32, 0.08);
+}
+
+.language-switch button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.language-switch button.active {
+  background: var(--orange);
+  color: #0c0a08;
+}
+
 .command-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
@@ -740,8 +771,14 @@ input:focus {
   .primary,
   .upload,
   .jump-link,
+  .masthead-actions,
+  .language-switch,
   .panel-title button {
     justify-content: center;
     width: 100%;
+  }
+
+  .language-switch button {
+    flex: 1;
   }
 }

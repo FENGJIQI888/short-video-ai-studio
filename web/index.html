@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>短视频创作工作台</title>
+    <title data-i18n="page.title">短视频创作工作台</title>
     <link rel="stylesheet" href="/web/styles.css" />
   </head>
   <body>
@@ -12,26 +12,26 @@
         <a class="brand" href="#">
           <span>SV</span>
           <div>
-            <strong>短视频团伙</strong>
+            <strong data-i18n="brand.name">短视频团伙</strong>
             <em>Creator OS</em>
           </div>
         </a>
 
         <nav class="rail-nav" aria-label="工作流">
-          <a class="active" href="#input">创作台</a>
-          <a href="#analysis-card">素材理解</a>
-          <a href="#topics-card">选题库</a>
-          <a href="#script-card">脚本稿</a>
+          <a class="active" href="#input" data-i18n="nav.console">创作台</a>
+          <a href="#analysis-card" data-i18n="nav.analysis">素材理解</a>
+          <a href="#topics-card" data-i18n="nav.topics">选题库</a>
+          <a href="#script-card" data-i18n="nav.script">脚本稿</a>
         </nav>
 
         <section class="rail-card">
           <p class="label">Pipeline</p>
           <ol class="steps" id="steps">
-            <li class="active" data-step="input"><span></span>素材输入</li>
-            <li data-step="analysis"><span></span>素材理解</li>
-            <li data-step="questions"><span></span>引导追问</li>
-            <li data-step="topics"><span></span>生成选题</li>
-            <li data-step="script"><span></span>拍摄脚本</li>
+            <li class="active" data-step="input"><span></span><b data-i18n="steps.input">素材输入</b></li>
+            <li data-step="analysis"><span></span><b data-i18n="steps.analysis">素材理解</b></li>
+            <li data-step="questions"><span></span><b data-i18n="steps.questions">引导追问</b></li>
+            <li data-step="topics"><span></span><b data-i18n="steps.topics">生成选题</b></li>
+            <li data-step="script"><span></span><b data-i18n="steps.script">拍摄脚本</b></li>
           </ol>
         </section>
 
@@ -45,24 +45,30 @@
         <section class="masthead">
           <div>
             <p class="label">AI Short Video Command Center</p>
-            <h1>素材变选题和脚本</h1>
+            <h1 data-i18n="hero.title">素材变选题和脚本</h1>
           </div>
-          <a class="jump-link" href="#input">开始生成</a>
+          <div class="masthead-actions">
+            <div class="language-switch" aria-label="Language">
+              <button type="button" class="active" data-lang="zh">中文</button>
+              <button type="button" data-lang="en">English</button>
+            </div>
+            <a class="jump-link" href="#input" data-i18n="hero.cta">开始生成</a>
+          </div>
         </section>
 
         <section class="command-grid">
           <section class="command-console" id="input">
             <div class="console-head">
               <span class="console-kicker">Input</span>
-              <strong>启动创作分析</strong>
+              <strong data-i18n="input.title">启动创作分析</strong>
             </div>
-            <textarea id="idea" rows="7" placeholder="例如：我有一段餐厅出餐的视频，想做成小红书探店内容，重点是环境好、出片、价格适中。"></textarea>
+            <textarea id="idea" rows="7" placeholder="例如：我有一段餐厅出餐的视频，想做成小红书探店内容，重点是环境好、出片、价格适中。" data-i18n-placeholder="input.placeholder"></textarea>
             <div class="console-actions">
               <label class="upload">
                 <input id="asset" type="file" accept="image/*,video/*" multiple />
-                <span>上传图片 / 视频</span>
+                <span data-i18n="input.upload">上传图片 / 视频</span>
               </label>
-              <button class="primary" id="startBtn">开始解析</button>
+              <button class="primary" id="startBtn" data-i18n="input.start">开始解析</button>
             </div>
             <ul class="asset-list" id="assetList"></ul>
           </section>
@@ -88,10 +94,10 @@
               <span>01</span>
               <div>
                 <p class="label">Material Read</p>
-                <h2>素材理解</h2>
+                <h2 data-i18n="analysis.title">素材理解</h2>
               </div>
             </div>
-            <pre class="analysis" id="analysis">发送素材后，这里会显示分析结果。</pre>
+            <pre class="analysis" id="analysis" data-i18n="analysis.empty">发送素材后，这里会显示分析结果。</pre>
           </article>
 
           <article class="panel question-panel">
@@ -99,11 +105,11 @@
               <span>02</span>
               <div>
                 <p class="label">Guided Prompt</p>
-                <h2>引导追问</h2>
+                <h2 data-i18n="questions.title">引导追问</h2>
               </div>
             </div>
             <div class="question-box" id="questionBox">
-              <p class="muted">完成素材分析后，会出现下一步问题。</p>
+              <p class="muted" data-i18n="questions.empty">完成素材分析后，会出现下一步问题。</p>
             </div>
           </article>
 
@@ -113,16 +119,16 @@
                 <span>03</span>
                 <div>
                   <p class="label">Topic Bank</p>
-                  <h2>选题方向</h2>
+                  <h2 data-i18n="topics.title">选题方向</h2>
                 </div>
               </div>
-              <button id="topicBtn">生成选题</button>
+              <button id="topicBtn" data-i18n="topics.generate">生成选题</button>
             </div>
-            <p class="muted" id="topicHint">完成引导问题后效果更好。</p>
+            <p class="muted" id="topicHint" data-i18n="topics.hint">完成引导问题后效果更好。</p>
             <div class="topics" id="topics">
               <article class="empty-card">
-                <strong>等待生成选题</strong>
-                <p>AI 会根据素材、目标用户和表达风格生成多个可拍方向。</p>
+                <strong data-i18n="topics.emptyTitle">等待生成选题</strong>
+                <p data-i18n="topics.emptyBody">AI 会根据素材、目标用户和表达风格生成多个可拍方向。</p>
               </article>
             </div>
           </article>
@@ -133,20 +139,20 @@
                 <span>04</span>
                 <div>
                   <p class="label">Script Draft</p>
-                  <h2>拍摄脚本</h2>
+                  <h2 data-i18n="script.title">拍摄脚本</h2>
                 </div>
               </div>
               <div class="script-actions">
-                <button id="copyBtn">复制</button>
-                <button id="downloadBtn">下载</button>
+                <button id="copyBtn" data-i18n="script.copy">复制</button>
+                <button id="downloadBtn" data-i18n="script.download">下载</button>
               </div>
             </div>
             <div class="script-shell">
               <div class="script-meta">
                 <span>Output</span>
-                <span id="scriptStatus">未生成</span>
+                <span id="scriptStatus" data-i18n="script.notGenerated">未生成</span>
               </div>
-              <pre class="script" id="script">选择一个选题后，脚本会显示在这里。</pre>
+              <pre class="script" id="script" data-i18n="script.empty">选择一个选题后，脚本会显示在这里。</pre>
             </div>
           </article>
         </section>

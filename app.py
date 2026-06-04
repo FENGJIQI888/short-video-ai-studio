@@ -36,38 +36,72 @@ IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 VIDEO_TYPES = {"video/mp4", "video/quicktime", "video/webm", "video/x-m4v"}
 MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "100"))
 
-QUESTION_FLOW = [
-    {
-        "id": "audience",
-        "label": "目标用户",
-        "question": "这条内容主要拍给谁看？",
-        "placeholder": "例如：刚开始做小红书的职场新人 / 想转型的摄影师 / 本地餐饮老板",
-    },
-    {
-        "id": "goal",
-        "label": "内容目标",
-        "question": "你希望这条视频达成什么结果？",
-        "placeholder": "例如：涨粉、引导私信、卖课、种草产品、解释一个观点",
-    },
-    {
-        "id": "platform",
-        "label": "发布平台",
-        "question": "你准备发到哪个平台？",
-        "placeholder": "例如：抖音、小红书、视频号、B站、快手",
-    },
-    {
-        "id": "style",
-        "label": "表达风格",
-        "question": "你希望视频是什么风格？",
-        "placeholder": "例如：口播干货、剧情反转、探店种草、教程拆解、情绪共鸣",
-    },
-    {
-        "id": "constraints",
-        "label": "拍摄限制",
-        "question": "拍摄时有什么限制或必须出现的元素？",
-        "placeholder": "例如：只有手机拍摄、不能露脸、必须出现产品、时长 30 秒内",
-    },
-]
+QUESTION_FLOW_BY_LANGUAGE = {
+    "zh": [
+        {
+            "id": "audience",
+            "label": "目标用户",
+            "question": "这条内容主要拍给谁看？",
+            "placeholder": "例如：刚开始做小红书的职场新人 / 想转型的摄影师 / 本地餐饮老板",
+        },
+        {
+            "id": "goal",
+            "label": "内容目标",
+            "question": "你希望这条视频达成什么结果？",
+            "placeholder": "例如：涨粉、引导私信、卖课、种草产品、解释一个观点",
+        },
+        {
+            "id": "platform",
+            "label": "发布平台",
+            "question": "你准备发到哪个平台？",
+            "placeholder": "例如：抖音、小红书、视频号、B站、快手",
+        },
+        {
+            "id": "style",
+            "label": "表达风格",
+            "question": "你希望视频是什么风格？",
+            "placeholder": "例如：口播干货、剧情反转、探店种草、教程拆解、情绪共鸣",
+        },
+        {
+            "id": "constraints",
+            "label": "拍摄限制",
+            "question": "拍摄时有什么限制或必须出现的元素？",
+            "placeholder": "例如：只有手机拍摄、不能露脸、必须出现产品、时长 30 秒内",
+        },
+    ],
+    "en": [
+        {
+            "id": "audience",
+            "label": "Audience",
+            "question": "Who is this video mainly for?",
+            "placeholder": "Example: new creators on TikTok / local restaurant owners / freelancers changing careers",
+        },
+        {
+            "id": "goal",
+            "label": "Content goal",
+            "question": "What should this video help you achieve?",
+            "placeholder": "Example: gain followers, drive DMs, sell a course, explain a point, promote a product",
+        },
+        {
+            "id": "platform",
+            "label": "Platform",
+            "question": "Where do you plan to publish it?",
+            "placeholder": "Example: TikTok, Instagram Reels, YouTube Shorts, Xiaohongshu, WeChat Channels",
+        },
+        {
+            "id": "style",
+            "label": "Style",
+            "question": "What kind of delivery style do you want?",
+            "placeholder": "Example: talking-head tips, story-driven, product review, tutorial, emotional hook",
+        },
+        {
+            "id": "constraints",
+            "label": "Constraints",
+            "question": "Any filming limits or must-have elements?",
+            "placeholder": "Example: phone only, no face on camera, must show product, under 30 seconds",
+        },
+    ],
+}
 
 
 app = FastAPI(title="Short Video Studio")
@@ -81,6 +115,7 @@ app.add_middleware(
 
 class ProjectCreate(BaseModel):
     text: str = ""
+    language: str = "zh"
 
 
 class AnswerRequest(BaseModel):
@@ -90,10 +125,20 @@ class AnswerRequest(BaseModel):
 
 class TopicRequest(BaseModel):
     count: int = Field(default=6, ge=3, le=10)
+    language: str = "zh"
 
 
 class ScriptRequest(BaseModel):
     topic: Dict[str, Any]
+    language: str = "zh"
+
+
+def normalize_language(language: Optional[str]) -> str:
+    return "en" if language == "en" else "zh"
+
+
+def is_english(project: Dict[str, Any]) -> bool:
+    return normalize_language(project.get("language")) == "en"
 
 
 def now_iso() -> str:
@@ -303,11 +348,24 @@ def call_gemini_json(prompt: str) -> Optional[Dict[str, Any]]:
 
 def project_brief(project: Dict[str, Any]) -> str:
     answers = project.get("answers", {})
+    english = is_english(project)
     asset_lines = [
         f"- {asset['kind']}：{asset['filename']}（{round(asset['size'] / 1024 / 1024, 2)} MB）"
         for asset in project.get("assets", [])
     ]
     answer_lines = [f"- {key}: {value}" for key, value in answers.items() if value]
+    if english:
+        return "\n".join(
+            [
+                f"Original user input: {project.get('text') or 'None'}",
+                "Assets:",
+                *(asset_lines or ["- None"]),
+                "Material summary:",
+                project.get("analysis", {}).get("summary", "Not analyzed yet"),
+                "User answers:",
+                *(answer_lines or ["- None"]),
+            ]
+        )
     return "\n".join(
         [
             f"用户原始输入：{project.get('text') or '无'}",
@@ -324,6 +382,18 @@ def project_brief(project: Dict[str, Any]) -> str:
 def fallback_analysis(project: Dict[str, Any]) -> Dict[str, Any]:
     text = project.get("text", "").strip()
     assets = project.get("assets", [])
+    if is_english(project):
+        kinds = ", ".join(sorted({asset["kind"] for asset in assets})) or "text"
+        base = text or "the uploaded material"
+        return {
+            "summary": f"This short-video material is based on {kinds}. The core clue is: {base[:120]}",
+            "opportunities": [
+                "Open with the audience's strongest pain point and show the result in the first three seconds.",
+                "Turn the material into one clear point instead of covering too much in one video.",
+                "Prioritize shootable actions and shots, not only copywriting.",
+            ],
+            "model": "local",
+        }
     kinds = "、".join(sorted({asset["kind"] for asset in assets})) or "文字"
     base = text or "用户上传的素材"
     return {
@@ -338,7 +408,17 @@ def fallback_analysis(project: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def analyze_project(project: Dict[str, Any]) -> Dict[str, Any]:
-    prompt = f"""你是短视频选题策划。请分析下面的用户素材，输出严格 JSON。
+    if is_english(project):
+        prompt = f"""You are a short-video content strategist. Analyze the user's material and output strict JSON in English.
+JSON fields:
+summary: material summary under 80 words
+opportunities: 3-5 shootable content opportunities
+risks: 1-3 content or expression risks
+
+{project_brief(project)}
+"""
+    else:
+        prompt = f"""你是短视频选题策划。请分析下面的用户素材，输出严格 JSON。
 JSON 字段：
 summary: 80 字以内素材摘要
 opportunities: 3-5 条可拍摄机会
@@ -363,7 +443,8 @@ risks: 1-3 条内容风险或表达风险
 
 def next_question(project: Dict[str, Any]) -> Optional[Dict[str, str]]:
     answered = project.get("answers", {})
-    for question in QUESTION_FLOW:
+    questions = QUESTION_FLOW_BY_LANGUAGE[normalize_language(project.get("language"))]
+    for question in questions:
         if not answered.get(question["id"]):
             return question
     return None
@@ -371,6 +452,35 @@ def next_question(project: Dict[str, Any]) -> Optional[Dict[str, str]]:
 
 def fallback_topics(project: Dict[str, Any], count: int) -> List[Dict[str, str]]:
     answers = project.get("answers", {})
+    if is_english(project):
+        audience = answers.get("audience") or "target audience"
+        goal = answers.get("goal") or "increase attention and conversion"
+        style = answers.get("style") or "talking-head tips"
+        seed = project.get("text") or project.get("analysis", {}).get("summary", "this material")
+        templates = [
+            ("Why your videos are not working: the real bottleneck", "Pain-point breakdown", "Start with a common mistake, then give one action viewers can use immediately."),
+            ("Use this structure for your next short video", "Tutorial template", "A step-by-step angle makes the video easier to film and easier to save."),
+            ("Same material, different angle, very different results", "Contrast angle", "Compare the ordinary version with the optimized version."),
+            ("The detail beginners usually miss", "Avoid-this mistake", "A concrete mistake creates instant audience identification."),
+            ("If you only have 30 seconds, say it like this", "Minimal script", "Compress the idea into one point, one example, and one action."),
+            ("Check these 3 things before you post", "Checklist", "Give viewers a practical checklist they can follow."),
+            ("3 shots that make ordinary material look premium", "Filming guide", "Focus on visual action and rhythm so the idea becomes shootable."),
+            ("This format works well for driving DMs", "Conversion angle", "Connect the content result to the viewer's next action."),
+            ("Explain the issue through one real scene", "Scene story", "Start from a specific situation and lead naturally to the insight."),
+            ("Understand this logic, and topic selection gets easier", "Framework", "Good for creators who want to sound more professional."),
+        ]
+        return [
+            {
+                "id": f"topic-{index}",
+                "title": title,
+                "angle": angle,
+                "audience": audience,
+                "goal": goal,
+                "style": style,
+                "reason": f"{reason} Material clue: {seed[:48]}",
+            }
+            for index, (title, angle, reason) in enumerate(templates[:count], start=1)
+        ]
     audience = answers.get("audience") or "目标用户"
     goal = answers.get("goal") or "提升关注和转化"
     style = answers.get("style") or "口播干货"
@@ -404,7 +514,18 @@ def fallback_topics(project: Dict[str, Any], count: int) -> List[Dict[str, str]]
 
 
 def generate_topics(project: Dict[str, Any], count: int) -> List[Dict[str, str]]:
-    prompt = f"""你是短视频选题策划。基于素材和用户补充，生成 {count} 个短视频选题。
+    if is_english(project):
+        prompt = f"""You are a short-video topic strategist. Based on the material and user answers, generate {count} short-video topics in English.
+Requirements:
+- Each topic must be directly shootable
+- Avoid generic advice
+- Titles should include conflict, outcome, or action
+- Output strict JSON: {{"topics":[{{"id":"topic-1","title":"","angle":"","audience":"","goal":"","style":"","reason":""}}]}}
+
+{project_brief(project)}
+"""
+    else:
+        prompt = f"""你是短视频选题策划。基于素材和用户补充，生成 {count} 个短视频选题。
 要求：
 - 每个选题必须适合直接拍摄
 - 不要泛泛而谈
@@ -422,6 +543,54 @@ def generate_topics(project: Dict[str, Any], count: int) -> List[Dict[str, str]]
 
 def fallback_script(project: Dict[str, Any], topic: Dict[str, Any]) -> Dict[str, Any]:
     answers = project.get("answers", {})
+    if is_english(project):
+        title = topic.get("title") or "Short-video shooting script"
+        audience = topic.get("audience") or answers.get("audience") or "target audience"
+        style = topic.get("style") or answers.get("style") or "talking-head tips"
+        goal = topic.get("goal") or answers.get("goal") or "get viewers to save and follow"
+        scenes = [
+            {
+                "time": "0-3s",
+                "shot": "Face the camera or show a close-up of the material. Put the key point in large subtitles.",
+                "voiceover": f"The biggest mistake for {audience} is not filming badly. It is failing to show the result first.",
+                "visual": "Quickly show the most conflicting or result-oriented part of the material.",
+            },
+            {
+                "time": "3-10s",
+                "shot": "Cut to an operation shot, example screenshot, or handheld prop.",
+                "voiceover": f"This video focuses on one thing: {topic.get('angle', 'making one issue easy to understand')}.",
+                "visual": "Use one example to prove the problem exists. Avoid long background explanation.",
+            },
+            {
+                "time": "10-22s",
+                "shot": "Three-part sequence: wrong way, better way, result comparison.",
+                "voiceover": "Say what the viewer will get, give one action, then explain what changes when they use it.",
+                "visual": "Show step 1, 2, and 3 on screen.",
+            },
+            {
+                "time": "22-30s",
+                "shot": "Return to the person or core material and close with confidence.",
+                "voiceover": f"If your goal is {goal}, use this structure for your next video. Save it before filming.",
+                "visual": "Keep the title and next action on the final frame.",
+            },
+        ]
+        return {
+            "title": title,
+            "hook": scenes[0]["voiceover"],
+            "format": style,
+            "duration": "30 seconds",
+            "shooting_notes": [
+                "Each shot should express only one information point.",
+                "The first three seconds must show a result or conflict.",
+                "Visual action matters more than abstract explanation.",
+            ],
+            "scenes": scenes,
+            "cover": {
+                "title": title[:28],
+                "subtitle": topic.get("angle", "One idea, clearly filmed"),
+            },
+            "markdown": "",
+        }
     title = topic.get("title") or "短视频拍摄脚本"
     audience = topic.get("audience") or answers.get("audience") or "目标用户"
     style = topic.get("style") or answers.get("style") or "口播干货"
@@ -471,37 +640,64 @@ def fallback_script(project: Dict[str, Any], topic: Dict[str, Any]) -> Dict[str,
     }
 
 
-def script_to_markdown(script: Dict[str, Any]) -> str:
+def script_to_markdown(script: Dict[str, Any], language: str = "zh") -> str:
+    english = normalize_language(language) == "en"
     lines = [
         f"# {script['title']}",
         "",
-        f"- 形式：{script.get('format', '')}",
-        f"- 时长：{script.get('duration', '')}",
-        f"- 开头钩子：{script.get('hook', '')}",
+        f"- {'Format' if english else '形式'}：{script.get('format', '')}",
+        f"- {'Duration' if english else '时长'}：{script.get('duration', '')}",
+        f"- {'Opening hook' if english else '开头钩子'}：{script.get('hook', '')}",
         "",
-        "## 分镜脚本",
+        "## Shooting Script" if english else "## 分镜脚本",
     ]
     for scene in script.get("scenes", []):
         lines.extend(
             [
                 "",
                 f"### {scene.get('time', '')}",
-                f"- 镜头：{scene.get('shot', '')}",
-                f"- 口播：{scene.get('voiceover', '')}",
-                f"- 画面：{scene.get('visual', '')}",
+                f"- {'Shot' if english else '镜头'}：{scene.get('shot', '')}",
+                f"- {'Voiceover' if english else '口播'}：{scene.get('voiceover', '')}",
+                f"- {'Visual' if english else '画面'}：{scene.get('visual', '')}",
             ]
         )
     notes = script.get("shooting_notes", [])
     if notes:
-        lines.extend(["", "## 拍摄提醒"])
+        lines.extend(["", "## Filming Notes" if english else "## 拍摄提醒"])
         lines.extend([f"- {note}" for note in notes])
     cover = script.get("cover") or {}
-    lines.extend(["", "## 封面建议", f"- 主标题：{cover.get('title', '')}", f"- 副标题：{cover.get('subtitle', '')}"])
+    lines.extend(
+        [
+            "",
+            "## Cover Direction" if english else "## 封面建议",
+            f"- {'Title' if english else '主标题'}：{cover.get('title', '')}",
+            f"- {'Subtitle' if english else '副标题'}：{cover.get('subtitle', '')}",
+        ]
+    )
     return "\n".join(lines) + "\n"
 
 
 def generate_script(project: Dict[str, Any], topic: Dict[str, Any]) -> Dict[str, Any]:
-    prompt = f"""你是短视频编导。请基于用户素材和选题生成可直接拍摄的脚本。
+    if is_english(project):
+        prompt = f"""You are a short-video director. Based on the user's material and selected topic, generate a directly shootable script in English.
+Output strict JSON:
+{{
+  "title":"",
+  "hook":"",
+  "format":"",
+  "duration":"30 seconds",
+  "shooting_notes":[""],
+  "scenes":[{{"time":"0-3s","shot":"","voiceover":"","visual":""}}],
+  "cover":{{"title":"","subtitle":""}}
+}}
+Requirements: English only, shootable, clear shot breakdown, strong first-three-second hook, no generic advice.
+
+Selected topic: {json.dumps(topic, ensure_ascii=False)}
+
+{project_brief(project)}
+"""
+    else:
+        prompt = f"""你是短视频编导。请基于用户素材和选题生成可直接拍摄的脚本。
 输出严格 JSON：
 {{
   "title":"",
@@ -522,7 +718,7 @@ def generate_script(project: Dict[str, Any], topic: Dict[str, Any]) -> Dict[str,
     script = result if result and not result.get("_error") else fallback_script(project, topic)
     if "scenes" not in script:
         script = fallback_script(project, topic)
-    script["markdown"] = script_to_markdown(script)
+    script["markdown"] = script_to_markdown(script, project.get("language", "zh"))
     persist_script_package(project, topic, script)
     return script
 
@@ -589,6 +785,7 @@ def create_project(payload: ProjectCreate) -> Dict[str, Any]:
     project = {
         "id": uuid.uuid4().hex[:12],
         "text": payload.text.strip(),
+        "language": normalize_language(payload.language),
         "assets": [],
         "answers": {},
         "topics": [],
@@ -597,7 +794,7 @@ def create_project(payload: ProjectCreate) -> Dict[str, Any]:
         "updated_at": now_iso(),
     }
     save_project(project)
-    log_project_event(project["id"], "project_created", {"text_length": len(project["text"])})
+    log_project_event(project["id"], "project_created", {"text_length": len(project["text"]), "language": project["language"]})
     return project
 
 
@@ -683,7 +880,7 @@ def upload_asset(project_id: str, file: UploadFile = File(...)) -> Dict[str, Any
         "id": uuid.uuid4().hex[:12],
         "filename": file.filename or destination.name,
         "path": str(destination),
-        "kind": "图片" if content_type in IMAGE_TYPES else "视频",
+        "kind": ("image" if content_type in IMAGE_TYPES else "video") if is_english(project) else ("图片" if content_type in IMAGE_TYPES else "视频"),
         "content_type": content_type,
         "size": size,
         "created_at": now_iso(),
@@ -733,6 +930,7 @@ def save_answer(project_id: str, payload: AnswerRequest) -> Dict[str, Any]:
 @app.post("/api/projects/{project_id}/topics")
 def topics(project_id: str, payload: TopicRequest) -> Dict[str, Any]:
     project = load_project(project_id)
+    project["language"] = normalize_language(payload.language)
     project["topics"] = generate_topics(project, payload.count)
     project["updated_at"] = now_iso()
     save_project(project)
@@ -743,6 +941,7 @@ def topics(project_id: str, payload: TopicRequest) -> Dict[str, Any]:
 @app.post("/api/projects/{project_id}/scripts")
 def scripts(project_id: str, payload: ScriptRequest) -> Dict[str, Any]:
     project = load_project(project_id)
+    project["language"] = normalize_language(payload.language)
     script = generate_script(project, payload.topic)
     project.setdefault("scripts", []).append({"topic": payload.topic, "script": script, "created_at": now_iso()})
     project["updated_at"] = now_iso()

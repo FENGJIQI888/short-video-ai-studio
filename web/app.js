@@ -1,8 +1,200 @@
+const I18N = {
+  zh: {
+    "page.title": "短视频创作工作台",
+    "brand.name": "短视频团伙",
+    "nav.console": "创作台",
+    "nav.analysis": "素材理解",
+    "nav.topics": "选题库",
+    "nav.script": "脚本稿",
+    "steps.input": "素材输入",
+    "steps.analysis": "素材理解",
+    "steps.questions": "引导追问",
+    "steps.topics": "生成选题",
+    "steps.script": "拍摄脚本",
+    "provider.checking": "模型：检测中",
+    "provider.openai": "模型：OpenAI / {model}",
+    "provider.gemini": "模型：Gemini / {model}",
+    "provider.local": "模型：本地规则",
+    "provider.unknown": "模型：状态未知",
+    "hero.title": "素材变选题和脚本",
+    "hero.cta": "开始生成",
+    "input.title": "启动创作分析",
+    "input.placeholder": "例如：我有一段餐厅出餐的视频，想做成小红书探店内容，重点是环境好、出片、价格适中。",
+    "input.upload": "上传图片 / 视频",
+    "input.start": "开始解析",
+    "input.busy": "解析中",
+    "analysis.title": "素材理解",
+    "analysis.empty": "发送素材后，这里会显示分析结果。",
+    "analysis.summary": "素材摘要：",
+    "analysis.opportunities": "可拍机会：",
+    "analysis.risks": "注意事项：",
+    "analysis.model": "生成方式：",
+    "analysis.modelError": "模型调用失败，已使用本地规则：",
+    "questions.title": "引导追问",
+    "questions.empty": "完成素材分析后，会出现下一步问题。",
+    "questions.doneTitle": "引导信息已完成",
+    "questions.doneBody": "现在可以生成选题。你也可以回到第一步修改素材后重新开始。",
+    "questions.save": "保存并继续",
+    "questions.saving": "保存中",
+    "topics.title": "选题方向",
+    "topics.generate": "生成选题",
+    "topics.generating": "生成中",
+    "topics.hint": "完成引导问题后效果更好。",
+    "topics.generated": "已生成 {count} 个选题",
+    "topics.emptyTitle": "等待生成选题",
+    "topics.emptyBody": "AI 会根据素材、目标用户和表达风格生成多个可拍方向。",
+    "topics.goal": "目标：",
+    "topics.button": "生成脚本 {index}",
+    "script.title": "拍摄脚本",
+    "script.copy": "复制",
+    "script.download": "下载",
+    "script.notGenerated": "未生成",
+    "script.generating": "生成中",
+    "script.generated": "已生成",
+    "script.failed": "失败",
+    "script.empty": "选择一个选题后，脚本会显示在这里。",
+    "script.working": "正在生成脚本...",
+    "script.error": "脚本生成失败。",
+    "toast.needInput": "先输入一段想法，或上传图片/视频",
+    "toast.needAnswer": "先填一下这一项",
+    "toast.analysisDone": "素材分析完成",
+    "toast.needAnalysis": "先完成素材分析",
+    "toast.scriptDone": "脚本已生成",
+    "toast.noScriptCopy": "还没有脚本可复制",
+    "toast.copied": "脚本已复制",
+    "toast.noScriptDownload": "还没有脚本可下载",
+    "thinking.analysisTitle": "正在理解素材",
+    "thinking.analysisDone": "素材理解完成",
+    "thinking.analysisSteps": ["读取你的文字和上传素材...", "提取可拍摄的内容线索...", "判断适合的短视频表达方向...", "整理下一步需要追问的问题..."],
+    "thinking.topicsTitle": "正在生成选题",
+    "thinking.topicsDone": "选题已生成",
+    "thinking.topicsSteps": ["复盘素材里的冲突点和卖点...", "匹配目标用户的兴趣入口...", "生成不同内容角度...", "筛选更适合拍摄的选题..."],
+    "thinking.scriptTitle": "正在组织拍摄脚本",
+    "thinking.scriptDone": "脚本已完成",
+    "thinking.scriptSteps": ["拆解选题的开头钩子...", "规划 30 秒分镜节奏...", "生成口播和画面建议...", "补充拍摄提醒和封面方向..."],
+    "thinking.default": "正在处理...",
+    "thinking.ready": "准备开始...",
+    "question.audience.label": "目标用户",
+    "question.audience.question": "这条内容主要拍给谁看？",
+    "question.audience.placeholder": "例如：刚开始做小红书的职场新人 / 想转型的摄影师 / 本地餐饮老板",
+    "question.goal.label": "内容目标",
+    "question.goal.question": "你希望这条视频达成什么结果？",
+    "question.goal.placeholder": "例如：涨粉、引导私信、卖课、种草产品、解释一个观点",
+    "question.platform.label": "发布平台",
+    "question.platform.question": "你准备发到哪个平台？",
+    "question.platform.placeholder": "例如：抖音、小红书、视频号、B站、快手",
+    "question.style.label": "表达风格",
+    "question.style.question": "你希望视频是什么风格？",
+    "question.style.placeholder": "例如：口播干货、剧情反转、探店种草、教程拆解、情绪共鸣",
+    "question.constraints.label": "拍摄限制",
+    "question.constraints.question": "拍摄时有什么限制或必须出现的元素？",
+    "question.constraints.placeholder": "例如：只有手机拍摄、不能露脸、必须出现产品、时长 30 秒内",
+  },
+  en: {
+    "page.title": "Short Video AI Studio",
+    "brand.name": "Short Video Studio",
+    "nav.console": "Console",
+    "nav.analysis": "Material Read",
+    "nav.topics": "Topic Bank",
+    "nav.script": "Script Draft",
+    "steps.input": "Input",
+    "steps.analysis": "Material Read",
+    "steps.questions": "Guided Prompt",
+    "steps.topics": "Topics",
+    "steps.script": "Script",
+    "provider.checking": "Model: checking",
+    "provider.openai": "Model: OpenAI / {model}",
+    "provider.gemini": "Model: Gemini / {model}",
+    "provider.local": "Model: local rules",
+    "provider.unknown": "Model: unknown",
+    "hero.title": "Material to topics and scripts",
+    "hero.cta": "Start",
+    "input.title": "Start creative analysis",
+    "input.placeholder": "Example: I have a restaurant serving video and want to turn it into a Xiaohongshu-style restaurant review focused on atmosphere, visual appeal, and fair pricing.",
+    "input.upload": "Upload image / video",
+    "input.start": "Start Analysis",
+    "input.busy": "Analyzing",
+    "analysis.title": "Material Read",
+    "analysis.empty": "After you submit material, the analysis will appear here.",
+    "analysis.summary": "Summary: ",
+    "analysis.opportunities": "Shootable opportunities:",
+    "analysis.risks": "Notes:",
+    "analysis.model": "Generated by: ",
+    "analysis.modelError": "Model call failed. Local rules used: ",
+    "questions.title": "Guided Prompt",
+    "questions.empty": "After the material read, the next question will appear here.",
+    "questions.doneTitle": "Guided prompts complete",
+    "questions.doneBody": "You can generate topics now, or go back to adjust the material.",
+    "questions.save": "Save and continue",
+    "questions.saving": "Saving",
+    "topics.title": "Topic Bank",
+    "topics.generate": "Generate Topics",
+    "topics.generating": "Generating",
+    "topics.hint": "Works best after completing the guided prompts.",
+    "topics.generated": "{count} topics generated",
+    "topics.emptyTitle": "Waiting for topics",
+    "topics.emptyBody": "AI will generate shootable angles based on the material, audience, and style.",
+    "topics.goal": "Goal: ",
+    "topics.button": "Generate Script {index}",
+    "script.title": "Script Draft",
+    "script.copy": "Copy",
+    "script.download": "Download",
+    "script.notGenerated": "Not generated",
+    "script.generating": "Generating",
+    "script.generated": "Generated",
+    "script.failed": "Failed",
+    "script.empty": "Select a topic and the script will appear here.",
+    "script.working": "Generating script...",
+    "script.error": "Script generation failed.",
+    "toast.needInput": "Enter an idea or upload an image/video first",
+    "toast.needAnswer": "Please answer this question first",
+    "toast.analysisDone": "Material analysis complete",
+    "toast.needAnalysis": "Complete material analysis first",
+    "toast.scriptDone": "Script generated",
+    "toast.noScriptCopy": "No script to copy yet",
+    "toast.copied": "Script copied",
+    "toast.noScriptDownload": "No script to download yet",
+    "thinking.analysisTitle": "Reading material",
+    "thinking.analysisDone": "Material read complete",
+    "thinking.analysisSteps": ["Reading your text and uploaded material...", "Extracting shootable content clues...", "Evaluating short-video directions...", "Preparing the next guided prompt..."],
+    "thinking.topicsTitle": "Generating topics",
+    "thinking.topicsDone": "Topics generated",
+    "thinking.topicsSteps": ["Reviewing conflict points and selling points...", "Matching audience interest entry points...", "Creating multiple content angles...", "Filtering for shootable topics..."],
+    "thinking.scriptTitle": "Structuring the script",
+    "thinking.scriptDone": "Script complete",
+    "thinking.scriptSteps": ["Breaking down the opening hook...", "Planning a 30-second shot rhythm...", "Writing voiceover and visual direction...", "Adding filming notes and cover direction..."],
+    "thinking.default": "Processing...",
+    "thinking.ready": "Ready...",
+    "question.audience.label": "Audience",
+    "question.audience.question": "Who is this video mainly for?",
+    "question.audience.placeholder": "Example: new TikTok creators / local restaurant owners / freelancers changing careers",
+    "question.goal.label": "Content goal",
+    "question.goal.question": "What should this video help you achieve?",
+    "question.goal.placeholder": "Example: gain followers, drive DMs, sell a course, explain a point, promote a product",
+    "question.platform.label": "Platform",
+    "question.platform.question": "Where do you plan to publish it?",
+    "question.platform.placeholder": "Example: TikTok, Instagram Reels, YouTube Shorts, Xiaohongshu, WeChat Channels",
+    "question.style.label": "Style",
+    "question.style.question": "What kind of delivery style do you want?",
+    "question.style.placeholder": "Example: talking-head tips, story-driven, product review, tutorial, emotional hook",
+    "question.constraints.label": "Constraints",
+    "question.constraints.question": "Any filming limits or must-have elements?",
+    "question.constraints.placeholder": "Example: phone only, no face on camera, must show product, under 30 seconds",
+  },
+};
+
 const state = {
   projectId: null,
   pendingFiles: [],
   selectedTopic: null,
   scriptMarkdown: "",
+  language: localStorage.getItem("language") === "en" ? "en" : "zh",
+  currentQuestion: null,
+  analysisGenerated: false,
+  topicsGenerated: false,
+  topicCount: 0,
+  scriptGenerated: false,
+  scriptStatusKey: "script.notGenerated",
 };
 
 const el = {
@@ -27,7 +219,40 @@ const el = {
   copyBtn: document.querySelector("#copyBtn"),
   downloadBtn: document.querySelector("#downloadBtn"),
   toast: document.querySelector("#toast"),
+  languageButtons: document.querySelectorAll("[data-lang]"),
 };
+
+function t(key, values = {}) {
+  let value = I18N[state.language][key] ?? I18N.zh[key] ?? key;
+  if (Array.isArray(value)) return value;
+  Object.entries(values).forEach(([name, replacement]) => {
+    value = value.replace(`{${name}}`, replacement);
+  });
+  return value;
+}
+
+function applyTranslations() {
+  document.documentElement.lang = state.language === "en" ? "en" : "zh-CN";
+  document.title = t("page.title");
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    if (node.id === "analysis" && state.analysisGenerated) return;
+    if (node.id === "script" && state.scriptGenerated) return;
+    if (node.id === "scriptStatus") return;
+    node.textContent = t(node.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+    node.placeholder = t(node.dataset.i18nPlaceholder);
+  });
+  el.languageButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.lang === state.language);
+  });
+  if (state.currentQuestion) renderQuestion(state.currentQuestion);
+  el.scriptStatus.textContent = t(state.scriptStatusKey);
+  if (state.topicsGenerated) {
+    el.topicHint.textContent = t("topics.generated", { count: state.topicCount });
+  }
+  loadModelStatus();
+}
 
 function toast(message) {
   el.toast.textContent = message;
@@ -78,7 +303,7 @@ async function runThinking(title, steps, minimumMs = 1900) {
   el.thinkingTitle.textContent = title;
   el.progressBar.style.width = "0%";
   el.thinkingPercent.textContent = "0%";
-  el.thinkingStep.textContent = steps[0] || "正在处理...";
+  el.thinkingStep.textContent = steps[0] || t("thinking.default");
 
   const stepDelay = Math.max(320, Math.floor(minimumMs / Math.max(steps.length, 1)));
   for (let index = 0; index < steps.length; index += 1) {
@@ -90,7 +315,7 @@ async function runThinking(title, steps, minimumMs = 1900) {
   }
 }
 
-async function finishThinking(finalStep = "完成") {
+async function finishThinking(finalStep) {
   el.thinkingStep.textContent = finalStep;
   el.progressBar.style.width = "100%";
   el.thinkingPercent.textContent = "100%";
@@ -112,60 +337,66 @@ async function loadModelStatus() {
   try {
     const status = await api("/api/model-status");
     if (status.provider === "openai") {
-      el.provider.textContent = `模型：OpenAI / ${status.openai_model}`;
+      el.provider.textContent = t("provider.openai", { model: status.openai_model });
     } else if (status.provider === "gemini") {
-      el.provider.textContent = `模型：Gemini / ${status.gemini_model}`;
+      el.provider.textContent = t("provider.gemini", { model: status.gemini_model });
     } else {
-      el.provider.textContent = "模型：本地规则";
+      el.provider.textContent = t("provider.local");
     }
   } catch {
-    el.provider.textContent = "模型：状态未知";
+    el.provider.textContent = t("provider.unknown");
   }
 }
 
 function renderAnalysis(analysis) {
-  const lines = [`素材摘要：${analysis.summary || "暂无"}`];
+  const lines = [`${t("analysis.summary")}${analysis.summary || "N/A"}`];
   if (analysis.opportunities?.length) {
-    lines.push("", "可拍机会：");
+    lines.push("", t("analysis.opportunities"));
     analysis.opportunities.forEach((item) => lines.push(`- ${item}`));
   }
   if (analysis.risks?.length) {
-    lines.push("", "注意事项：");
+    lines.push("", t("analysis.risks"));
     analysis.risks.forEach((item) => lines.push(`- ${item}`));
   }
   if (analysis.model) {
-    lines.push("", `生成方式：${analysis.model}`);
-    el.provider.textContent = `模型：${analysis.model}`;
+    lines.push("", `${t("analysis.model")}${analysis.model}`);
+    el.provider.textContent = `Model: ${analysis.model}`;
   }
   if (analysis.model_error) {
-    lines.push("", `模型调用失败，已使用本地规则：${analysis.model_error}`);
+    lines.push("", `${t("analysis.modelError")}${analysis.model_error}`);
   }
+  state.analysisGenerated = true;
   el.analysis.textContent = lines.join("\n");
 }
 
+function questionText(question, field) {
+  return t(`question.${question.id}.${field}`) || question[field];
+}
+
 function renderQuestion(question) {
+  state.currentQuestion = question;
   if (!question) {
     el.questionBox.innerHTML = `
-      <p class="question-title">引导信息已完成</p>
-      <p class="muted">现在可以生成选题。你也可以回到第一步修改素材后重新开始。</p>
+      <p class="question-title">${t("questions.doneTitle")}</p>
+      <p class="muted">${t("questions.doneBody")}</p>
     `;
     return;
   }
   el.questionBox.innerHTML = `
-    <p class="question-title">${question.label}</p>
-    <p>${question.question}</p>
-    <input id="answerInput" placeholder="${question.placeholder}" />
-    <button id="answerBtn">保存并继续</button>
+    <p class="question-title">${questionText(question, "label")}</p>
+    <p>${questionText(question, "question")}</p>
+    <input id="answerInput" placeholder="${questionText(question, "placeholder")}" />
+    <button id="answerBtn">${t("questions.save")}</button>
   `;
   document.querySelector("#answerBtn").addEventListener("click", async () => {
     const input = document.querySelector("#answerInput");
     const answer = input.value.trim();
     if (!answer) {
-      toast("先填一下这一项");
+      toast(t("toast.needAnswer"));
       return;
     }
     try {
-      setBusy(document.querySelector("#answerBtn"), true, "保存中");
+      setBusy(document.querySelector("#answerBtn"), true, t("questions.saving"));
       const result = await api(`/api/projects/${state.projectId}/answers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -182,18 +413,20 @@ function renderQuestion(question) {
 
 function renderTopics(topics) {
   el.topics.innerHTML = "";
+  state.topicsGenerated = true;
+  state.topicCount = topics.length;
   topics.forEach((topic, index) => {
     const card = document.createElement("article");
     card.className = "topic-card";
     card.innerHTML = `
       <div class="tag-row">
-        <span class="tag">${topic.angle || "选题"}</span>
-        <span class="tag">${topic.style || "短视频"}</span>
+        <span class="tag">${topic.angle || (state.language === "en" ? "Topic" : "选题")}</span>
+        <span class="tag">${topic.style || (state.language === "en" ? "Short video" : "短视频")}</span>
       </div>
       <h3>${topic.title}</h3>
       <p>${topic.reason || ""}</p>
-      <p class="muted">目标：${topic.goal || "提升内容效果"}</p>
-      <button>生成脚本 ${String(index + 1).padStart(2, "0")}</button>
+      <p class="muted">${t("topics.goal")}${topic.goal || (state.language === "en" ? "Improve content performance" : "提升内容效果")}</p>
+      <button>${t("topics.button", { index: String(index + 1).padStart(2, "0") })}</button>
     `;
     card.querySelector("button").addEventListener("click", () => {
       document.querySelectorAll(".topic-card").forEach((item) => item.classList.remove("selected"));
@@ -207,12 +440,12 @@ function renderTopics(topics) {
 async function createProject() {
   const text = el.idea.value.trim();
   if (!text && state.pendingFiles.length === 0) {
-    throw new Error("先输入一段想法，或上传图片/视频");
+    throw new Error(t("toast.needInput"));
   }
   const project = await api("/api/projects", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, language: state.language }),
   });
   state.projectId = project.id;
   for (const file of state.pendingFiles) {
@@ -227,25 +460,20 @@ async function createProject() {
 
 async function start() {
   try {
-    setBusy(el.startBtn, true, "解析中");
+    setBusy(el.startBtn, true, t("input.busy"));
     updateStep("analysis");
     await createProject();
-    const thinking = runThinking("正在理解素材", [
-      "读取你的文字和上传素材...",
-      "提取可拍摄的内容线索...",
-      "判断适合的短视频表达方向...",
-      "整理下一步需要追问的问题...",
-    ]);
+    const thinking = runThinking(t("thinking.analysisTitle"), t("thinking.analysisSteps"));
     const [analysis] = await Promise.all([
       api(`/api/projects/${state.projectId}/analyze`, { method: "POST" }),
       thinking,
     ]);
-    await finishThinking("素材理解完成");
+    await finishThinking(t("thinking.analysisDone"));
     renderAnalysis(analysis);
     const next = await api(`/api/projects/${state.projectId}/questions/next`);
     renderQuestion(next.question);
     updateStep("questions");
-    toast("素材分析完成");
+    toast(t("toast.analysisDone"));
   } catch (error) {
     el.thinking.classList.add("hidden");
     toast(error.message);
@@ -256,29 +484,24 @@ async function start() {
 
 async function generateTopics() {
   if (!state.projectId) {
-    toast("先完成素材分析");
+    toast(t("toast.needAnalysis"));
     return;
   }
   try {
-    setBusy(el.topicBtn, true, "生成中");
+    setBusy(el.topicBtn, true, t("topics.generating"));
     updateStep("topics");
-    const thinking = runThinking("正在生成选题", [
-      "复盘素材里的冲突点和卖点...",
-      "匹配目标用户的兴趣入口...",
-      "生成不同内容角度...",
-      "筛选更适合拍摄的选题...",
-    ]);
+    const thinking = runThinking(t("thinking.topicsTitle"), t("thinking.topicsSteps"));
     const [result] = await Promise.all([
       api(`/api/projects/${state.projectId}/topics`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 6 }),
+        body: JSON.stringify({ count: 6, language: state.language }),
       }),
       thinking,
     ]);
-    await finishThinking("选题已生成");
+    await finishThinking(t("thinking.topicsDone"));
     renderTopics(result.topics);
-    el.topicHint.textContent = `已生成 ${result.topics.length} 个选题`;
+    el.topicHint.textContent = t("topics.generated", { count: result.topics.length });
   } catch (error) {
     el.thinking.classList.add("hidden");
     toast(error.message);
@@ -290,35 +513,43 @@ async function generateTopics() {
 async function generateScript(topic) {
   try {
     state.selectedTopic = topic;
-    el.scriptStatus.textContent = "生成中";
-    el.script.textContent = "正在生成脚本...";
+    state.scriptStatusKey = "script.generating";
+    el.scriptStatus.textContent = t(state.scriptStatusKey);
+    el.script.textContent = t("script.working");
     updateStep("script");
-    const thinking = runThinking("正在组织拍摄脚本", [
-      "拆解选题的开头钩子...",
-      "规划 30 秒分镜节奏...",
-      "生成口播和画面建议...",
-      "补充拍摄提醒和封面方向...",
-    ], 2300);
+    const thinking = runThinking(t("thinking.scriptTitle"), t("thinking.scriptSteps"), 2300);
     const [result] = await Promise.all([
       api(`/api/projects/${state.projectId}/scripts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic }),
+        body: JSON.stringify({ topic, language: state.language }),
       }),
       thinking,
     ]);
-    await finishThinking("脚本已完成");
+    await finishThinking(t("thinking.scriptDone"));
     state.scriptMarkdown = result.script.markdown || "";
+    state.scriptGenerated = true;
     el.script.textContent = state.scriptMarkdown || JSON.stringify(result.script, null, 2);
-    el.scriptStatus.textContent = "已生成";
-    toast("脚本已生成");
+    state.scriptStatusKey = "script.generated";
+    el.scriptStatus.textContent = t(state.scriptStatusKey);
+    toast(t("toast.scriptDone"));
   } catch (error) {
     el.thinking.classList.add("hidden");
-    el.script.textContent = "脚本生成失败。";
-    el.scriptStatus.textContent = "失败";
+    state.scriptGenerated = false;
+    el.script.textContent = t("script.error");
+    state.scriptStatusKey = "script.failed";
+    el.scriptStatus.textContent = t(state.scriptStatusKey);
     toast(error.message);
   }
 }
+
+el.languageButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    state.language = button.dataset.lang === "en" ? "en" : "zh";
+    localStorage.setItem("language", state.language);
+    applyTranslations();
+  });
+});
 
 el.asset.addEventListener("change", () => {
   state.pendingFiles = Array.from(el.asset.files || []);
@@ -330,25 +561,25 @@ el.topicBtn.addEventListener("click", generateTopics);
 
 el.copyBtn.addEventListener("click", async () => {
   if (!state.scriptMarkdown) {
-    toast("还没有脚本可复制");
+    toast(t("toast.noScriptCopy"));
     return;
   }
   await navigator.clipboard.writeText(state.scriptMarkdown);
-  toast("脚本已复制");
+  toast(t("toast.copied"));
 });
 
 el.downloadBtn.addEventListener("click", () => {
   if (!state.scriptMarkdown) {
-    toast("还没有脚本可下载");
+    toast(t("toast.noScriptDownload"));
     return;
   }
   const blob = new Blob([state.scriptMarkdown], { type: "text/markdown;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "short-video-script.md";
+  link.download = state.language === "en" ? "short-video-script.md" : "短视频脚本.md";
   link.click();
   URL.revokeObjectURL(url);
 });
 
-loadModelStatus();
+applyTranslations();
