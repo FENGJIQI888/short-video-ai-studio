@@ -1,0 +1,23 @@
+title: "3 个提高短视频完播率的小技巧"
+output: "output/demo_short.mp4"
+size: [1080, 1920]
+fps: 30
+music:
+  enabled: true
+  volume: 0.08
+scenes:
+  - duration: 3.0
+    headline: "开头 3 秒"
+    body: "先抛问题，再给结果。观众要立刻知道继续看的价值。"
+    background: "#151515"
+    accent: "#00D1B2"
+  - duration: 3.2
+    headline: "一屏一重点"
+    body: "每个画面只讲一个信息点，字幕短、节奏快、停顿少。"
+    background: "#102A43"
+    accent: "#F9C74F"
+  - duration: 3.0
+    headline: "结尾给行动"
+    body: "最后明确告诉观众下一步：收藏、评论或看下一条。"
+    background: "#2B193D"
+    accent: "#F8961E"

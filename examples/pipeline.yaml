@@ -1,0 +1,13 @@
+topic: "短视频账号如何提高完播率"
+audience: "刚开始做知识类短视频的创作者"
+persona: "短视频运营教练"
+pain_points:
+  - "开头讲了很多背景，观众还没听到重点就划走了"
+  - "每条视频都想讲完整，结果信息太散"
+takeaways:
+  - "开头 3 秒只讲观众能得到什么"
+  - "每条视频只保留一个核心动作，其他内容留到下一条"
+call_to_action: "把这套结构保存下来，下一条视频直接套。"
+cover_title: "完播率提升"
+cover_subtitle: "开头 3 秒这样改"
+output_root: "output/projects"

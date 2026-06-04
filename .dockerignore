@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+*.pyc
+.env
+data
+uploads
+output
+.design
+.libtv
+signal-final-check.png
+/*.html

@@ -1,0 +1,18 @@
+defaults:
+  poll: 30
+  session: 0
+  download_dir: output/dreamina
+  model_version: seedance2.0fast
+  video_resolution: 720p
+  ratio: "9:16"
+  duration: 5
+
+tasks:
+  - name: hook_opening
+    type: text2video
+    prompt: "竖屏短视频，镜头快速推进，桌面上一本笔记本打开，字幕空间清晰，商业知识分享风格，光线干净"
+
+  - name: key_point
+    type: text2video
+    duration: 6
+    prompt: "竖屏短视频，年轻创作者在电脑前整理短视频脚本，画面节奏轻快，镜头从侧面平移，真实感"

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>短视频创作工作台</title>
+    <link rel="stylesheet" href="/web/styles.css" />
+  </head>
+  <body>
+    <div class="app-frame">
+      <aside class="rail">
+        <a class="brand" href="#">
+          <span>SV</span>
+          <div>
+            <strong>短视频团伙</strong>
+            <em>Creator OS</em>
+          </div>
+        </a>
+
+        <nav class="rail-nav" aria-label="工作流">
+          <a class="active" href="#input">创作台</a>
+          <a href="#analysis-card">素材理解</a>
+          <a href="#topics-card">选题库</a>
+          <a href="#script-card">脚本稿</a>
+        </nav>
+
+        <section class="rail-card">
+          <p class="label">Pipeline</p>
+          <ol class="steps" id="steps">
+            <li class="active" data-step="input"><span></span>素材输入</li>
+            <li data-step="analysis"><span></span>素材理解</li>
+            <li data-step="questions"><span></span>引导追问</li>
+            <li data-step="topics"><span></span>生成选题</li>
+            <li data-step="script"><span></span>拍摄脚本</li>
+          </ol>
+        </section>
+
+        <section class="rail-card muted-card">
+          <p class="label">Model</p>
+          <div class="status-pill" id="provider">模型：检测中</div>
+        </section>
+      </aside>
+
+      <main class="deck">
+        <section class="masthead">
+          <div>
+            <p class="label">AI Short Video Command Center</p>
+            <h1>素材变选题和脚本</h1>
+          </div>
+          <a class="jump-link" href="#input">开始生成</a>
+        </section>
+
+        <section class="command-grid">
+          <section class="command-console" id="input">
+            <div class="console-head">
+              <span class="console-kicker">Input</span>
+              <strong>启动创作分析</strong>
+            </div>
+            <textarea id="idea" rows="7" placeholder="例如：我有一段餐厅出餐的视频，想做成小红书探店内容，重点是环境好、出片、价格适中。"></textarea>
+            <div class="console-actions">
+              <label class="upload">
+                <input id="asset" type="file" accept="image/*,video/*" multiple />
+                <span>上传图片 / 视频</span>
+              </label>
+              <button class="primary" id="startBtn">开始解析</button>
+            </div>
+            <ul class="asset-list" id="assetList"></ul>
+          </section>
+
+          <section class="thinking hidden" id="thinking">
+            <div class="thinking-head">
+              <div>
+                <p class="label">Processing</p>
+                <strong id="thinkingTitle">正在处理</strong>
+              </div>
+              <span id="thinkingPercent">0%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p id="thinkingStep">准备开始...</p>
+          </section>
+        </section>
+
+        <section class="workspace-grid">
+          <article class="panel analysis-panel" id="analysis-card">
+            <div class="panel-title">
+              <span>01</span>
+              <div>
+                <p class="label">Material Read</p>
+                <h2>素材理解</h2>
+              </div>
+            </div>
+            <pre class="analysis" id="analysis">发送素材后，这里会显示分析结果。</pre>
+          </article>
+
+          <article class="panel question-panel">
+            <div class="panel-title">
+              <span>02</span>
+              <div>
+                <p class="label">Guided Prompt</p>
+                <h2>引导追问</h2>
+              </div>
+            </div>
+            <div class="question-box" id="questionBox">
+              <p class="muted">完成素材分析后，会出现下一步问题。</p>
+            </div>
+          </article>
+
+          <article class="panel topics-panel" id="topics-card">
+            <div class="panel-title with-action">
+              <div class="title-row">
+                <span>03</span>
+                <div>
+                  <p class="label">Topic Bank</p>
+                  <h2>选题方向</h2>
+                </div>
+              </div>
+              <button id="topicBtn">生成选题</button>
+            </div>
+            <p class="muted" id="topicHint">完成引导问题后效果更好。</p>
+            <div class="topics" id="topics">
+              <article class="empty-card">
+                <strong>等待生成选题</strong>
+                <p>AI 会根据素材、目标用户和表达风格生成多个可拍方向。</p>
+              </article>
+            </div>
+          </article>
+
+          <article class="panel script-panel" id="script-card">
+            <div class="panel-title with-action">
+              <div class="title-row">
+                <span>04</span>
+                <div>
+                  <p class="label">Script Draft</p>
+                  <h2>拍摄脚本</h2>
+                </div>
+              </div>
+              <div class="script-actions">
+                <button id="copyBtn">复制</button>
+                <button id="downloadBtn">下载</button>
+              </div>
+            </div>
+            <div class="script-shell">
+              <div class="script-meta">
+                <span>Output</span>
+                <span id="scriptStatus">未生成</span>
+              </div>
+              <pre class="script" id="script">选择一个选题后，脚本会显示在这里。</pre>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="/web/app.js"></script>
+  </body>
+</html>
