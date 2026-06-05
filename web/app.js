@@ -18,6 +18,19 @@ const I18N = {
     "provider.unknown": "模型：状态未知",
     "hero.title": "AI赋能短视频",
     "hero.cta": "开始生成",
+    "offer.kicker": "今天就能卖的服务",
+    "offer.title": "¥20 首单试跑",
+    "offer.body": "客户发一段素材，你交付 3 个选题、1 条可拍脚本和 5 个标题钩子。",
+    "offer.start": "开始做一单",
+    "offer.copy": "复制成交话术",
+    "offer.audienceKicker": "优先找这类客户",
+    "offer.audience1": "餐饮、美业、健身、民宿等本地商家",
+    "offer.audience2": "有素材但不知道怎么发的老板",
+    "offer.audience3": "正在做探店、带货或账号起号的人",
+    "offer.deliveryKicker": "交付标准",
+    "offer.delivery1": "10 分钟内生成初稿",
+    "offer.delivery2": "按客户行业补一句拍摄建议",
+    "offer.delivery3": "满意后升级 ¥199/月内容包",
     "input.title": "启动创作分析",
     "input.placeholder": "例如：我有一段餐厅出餐的视频，想做成小红书探店内容，重点是环境好、出片、价格适中。",
     "input.upload": "上传图片 / 视频",
@@ -63,6 +76,7 @@ const I18N = {
     "toast.noScriptCopy": "还没有脚本可复制",
     "toast.copied": "脚本已复制",
     "toast.noScriptDownload": "还没有脚本可下载",
+    "toast.offerCopied": "成交话术已复制",
     "thinking.analysisTitle": "正在理解素材",
     "thinking.analysisDone": "素材理解完成",
     "thinking.analysisSteps": ["读取你的文字和上传素材...", "提取可拍摄的内容线索...", "判断适合的短视频表达方向...", "整理下一步需要追问的问题..."],
@@ -109,6 +123,19 @@ const I18N = {
     "provider.unknown": "Model: unknown",
     "hero.title": "AI-powered short video creation",
     "hero.cta": "Start",
+    "offer.kicker": "A service you can sell today",
+    "offer.title": "$3 first-run audit",
+    "offer.body": "Your client sends one piece of material. You deliver 3 topic angles, 1 shootable script, and 5 hook titles.",
+    "offer.start": "Run a paid sample",
+    "offer.copy": "Copy sales message",
+    "offer.audienceKicker": "Best first customers",
+    "offer.audience1": "Local restaurants, beauty, fitness, hospitality, and service businesses",
+    "offer.audience2": "Owners with raw material but no idea what to post",
+    "offer.audience3": "Creators building review, commerce, or short-form accounts",
+    "offer.deliveryKicker": "Delivery promise",
+    "offer.delivery1": "Draft the first pass in 10 minutes",
+    "offer.delivery2": "Add one industry-specific filming note",
+    "offer.delivery3": "Upsell happy clients to a $29/month content pack",
     "input.title": "Start creative analysis",
     "input.placeholder": "Example: I have a restaurant serving video and want to turn it into a Xiaohongshu-style restaurant review focused on atmosphere, visual appeal, and fair pricing.",
     "input.upload": "Upload image / video",
@@ -154,6 +181,7 @@ const I18N = {
     "toast.noScriptCopy": "No script to copy yet",
     "toast.copied": "Script copied",
     "toast.noScriptDownload": "No script to download yet",
+    "toast.offerCopied": "Sales message copied",
     "thinking.analysisTitle": "Reading material",
     "thinking.analysisDone": "Material read complete",
     "thinking.analysisSteps": ["Reading your text and uploaded material...", "Extracting shootable content clues...", "Evaluating short-video directions...", "Preparing the next guided prompt..."],
@@ -218,6 +246,7 @@ const el = {
   scriptStatus: document.querySelector("#scriptStatus"),
   copyBtn: document.querySelector("#copyBtn"),
   downloadBtn: document.querySelector("#downloadBtn"),
+  copyOfferBtn: document.querySelector("#copyOfferBtn"),
   toast: document.querySelector("#toast"),
   languageButtons: document.querySelectorAll("[data-lang]"),
 };
@@ -437,6 +466,44 @@ function renderTopics(topics) {
   });
 }
 
+function offerMessage() {
+  if (state.language === "en") {
+    return [
+      "I am testing a short-video content service for local businesses.",
+      "For $3, send me one photo, video, or raw idea and I will return:",
+      "1. 3 shootable short-video topic angles",
+      "2. 1 practical filming script",
+      "3. 5 hook titles you can post with",
+      "If the first run is useful, I can turn it into a weekly content pack.",
+    ].join("\n");
+  }
+
+  return [
+    "我现在在做一个短视频内容试跑服务。",
+    "你发我一张图、一段视频，或者一段想法，我收 20 元帮你出一版：",
+    "1. 3 个适合你店/账号的短视频选题",
+    "2. 1 条可以直接拍的脚本",
+    "3. 5 个标题/开头钩子",
+    "如果这次有用，后面可以给你做每周内容包。",
+  ].join("\n");
+}
+
+async function copyText(text) {
+  if (navigator.clipboard) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const input = document.createElement("textarea");
+  input.value = text;
+  input.setAttribute("readonly", "");
+  input.style.position = "fixed";
+  input.style.opacity = "0";
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand("copy");
+  input.remove();
+}
+
 async function createProject() {
   const text = el.idea.value.trim();
   if (!text && state.pendingFiles.length === 0) {
@@ -559,12 +626,17 @@ el.asset.addEventListener("change", () => {
 el.startBtn.addEventListener("click", start);
 el.topicBtn.addEventListener("click", generateTopics);
 
+el.copyOfferBtn.addEventListener("click", async () => {
+  await copyText(offerMessage());
+  toast(t("toast.offerCopied"));
+});
+
 el.copyBtn.addEventListener("click", async () => {
   if (!state.scriptMarkdown) {
     toast(t("toast.noScriptCopy"));
     return;
   }
-  await navigator.clipboard.writeText(state.scriptMarkdown);
+  await copyText(state.scriptMarkdown);
   toast(t("toast.copied"));
 });
 

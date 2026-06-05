@@ -303,6 +303,80 @@ h2 {
   color: #0c0a08;
 }
 
+.offer-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr) minmax(0, 0.85fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.offer-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(17, 17, 17, 0.94);
+  padding: 18px;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
+}
+
+.offer-primary {
+  border-color: var(--line-hot);
+  background:
+    linear-gradient(120deg, rgba(255, 111, 32, 0.16), rgba(255, 209, 102, 0.04)),
+    var(--panel);
+}
+
+.offer-card h2 {
+  margin-bottom: 8px;
+  font-size: 30px;
+  line-height: 1.08;
+}
+
+.offer-card p:not(.label) {
+  margin-bottom: 14px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.offer-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.offer-actions button {
+  border-color: var(--line-hot);
+  background: rgba(255, 111, 32, 0.08);
+  color: var(--orange-2);
+  font-weight: 900;
+}
+
+.offer-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.offer-list li {
+  position: relative;
+  color: var(--muted);
+  line-height: 1.55;
+  padding-left: 18px;
+}
+
+.offer-list li::before {
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--orange);
+  content: "";
+}
+
 .command-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
@@ -733,6 +807,7 @@ input:focus {
   }
 
   .masthead,
+  .offer-strip,
   .command-grid,
   .workspace-grid {
     grid-template-columns: 1fr;
@@ -771,6 +846,7 @@ input:focus {
   .primary,
   .upload,
   .jump-link,
+  .offer-actions button,
   .masthead-actions,
   .language-switch,
   .panel-title button {
