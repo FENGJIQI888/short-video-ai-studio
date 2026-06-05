@@ -86,6 +86,33 @@
           </article>
         </section>
 
+        <section class="trial-panel" id="trial-order">
+          <div class="panel-title with-action">
+            <div class="title-row">
+              <span>¥20</span>
+              <div>
+                <p class="label" data-i18n="trial.kicker">Paid Trial Intake</p>
+                <h2 data-i18n="trial.title">提交首单试跑需求</h2>
+              </div>
+            </div>
+            <strong class="trial-price" data-i18n="trial.price">首单 ¥20</strong>
+          </div>
+
+          <form class="trial-form" id="trialForm">
+            <input id="trialName" maxlength="80" data-i18n-placeholder="trial.name" placeholder="你的称呼（可选）" />
+            <input id="trialContact" maxlength="120" required data-i18n-placeholder="trial.contact" placeholder="微信 / 手机 / 邮箱（必填）" />
+            <input id="trialBusiness" maxlength="120" data-i18n-placeholder="trial.business" placeholder="行业或账号类型，例如：餐饮店 / 美甲 / 探店号" />
+            <input id="trialPlatform" maxlength="80" data-i18n-placeholder="trial.platform" placeholder="发布平台，例如：抖音 / 小红书 / 视频号" />
+            <textarea id="trialMaterial" maxlength="1200" required rows="4" data-i18n-placeholder="trial.material" placeholder="简单描述你的素材和想要的结果，例如：有一段餐厅出餐视频，想做小红书探店内容。"></textarea>
+            <div class="trial-actions">
+              <button class="primary" id="trialSubmitBtn" type="submit" data-i18n="trial.submit">提交试跑需求</button>
+              <p id="trialHint" data-i18n="trial.hint">提交后会生成订单记录，方便人工收款和交付。</p>
+            </div>
+          </form>
+
+          <div class="trial-result hidden" id="trialResult"></div>
+        </section>
+
         <section class="command-grid">
           <section class="command-console" id="input">
             <div class="console-head">

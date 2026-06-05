@@ -133,6 +133,15 @@ class ScriptRequest(BaseModel):
     language: str = "zh"
 
 
+class TrialOrderCreate(BaseModel):
+    name: str = Field(default="", max_length=80)
+    contact: str = Field(..., min_length=2, max_length=120)
+    business: str = Field(default="", max_length=120)
+    platform: str = Field(default="", max_length=80)
+    material: str = Field(..., min_length=4, max_length=1200)
+    language: str = "zh"
+
+
 def normalize_language(language: Optional[str]) -> str:
     return "en" if language == "en" else "zh"
 
@@ -188,6 +197,25 @@ def init_db() -> None:
         )
         connection.execute("CREATE INDEX IF NOT EXISTS idx_projects_updated_at ON projects(updated_at)")
         connection.execute("CREATE INDEX IF NOT EXISTS idx_events_project_id ON project_events(project_id)")
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS trial_orders (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                contact TEXT NOT NULL,
+                business TEXT NOT NULL,
+                platform TEXT NOT NULL,
+                material TEXT NOT NULL,
+                language TEXT NOT NULL,
+                amount_cents INTEGER NOT NULL,
+                currency TEXT NOT NULL,
+                status TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        connection.execute("CREATE INDEX IF NOT EXISTS idx_trial_orders_created_at ON trial_orders(created_at)")
 
 
 def migrate_json_projects() -> None:
@@ -266,6 +294,66 @@ def save_project(project: Dict[str, Any]) -> None:
         )
 
 
+def save_trial_order(payload: TrialOrderCreate) -> Dict[str, Any]:
+    created_at = now_iso()
+    order = {
+        "id": uuid.uuid4().hex[:12],
+        "name": payload.name.strip(),
+        "contact": payload.contact.strip(),
+        "business": payload.business.strip(),
+        "platform": payload.platform.strip(),
+        "material": payload.material.strip(),
+        "language": normalize_language(payload.language),
+        "amount_cents": 2000,
+        "currency": "CNY",
+        "status": "new",
+        "created_at": created_at,
+        "updated_at": created_at,
+    }
+    with get_db() as connection:
+        connection.execute(
+            """
+            INSERT INTO trial_orders (
+                id, name, contact, business, platform, material, language,
+                amount_cents, currency, status, created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                order["id"],
+                order["name"],
+                order["contact"],
+                order["business"],
+                order["platform"],
+                order["material"],
+                order["language"],
+                order["amount_cents"],
+                order["currency"],
+                order["status"],
+                order["created_at"],
+                order["updated_at"],
+            ),
+        )
+    return order
+
+
+def row_to_trial_order(row: sqlite3.Row) -> Dict[str, Any]:
+    return {
+        "id": row["id"],
+        "name": row["name"],
+        "contact": row["contact"],
+        "business": row["business"],
+        "platform": row["platform"],
+        "material": row["material"],
+        "language": row["language"],
+        "amount_cents": row["amount_cents"],
+        "currency": row["currency"],
+        "status": row["status"],
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"],
+    }
+
+
 def model_provider() -> str:
     if os.getenv("OPENAI_API_KEY"):
         return "openai"
@@ -283,6 +371,19 @@ def model_status() -> Dict[str, Any]:
         "gemini_configured": bool(os.getenv("GEMINI_API_KEY")),
         "openai_model": openai_model,
         "gemini_model": gemini_model,
+    }
+
+
+def business_config() -> Dict[str, Any]:
+    contact = os.getenv("PUBLIC_CONTACT", "").strip()
+    payment_note = os.getenv("PUBLIC_PAYMENT_NOTE", "").strip()
+    return {
+        "trial_price": 20,
+        "trial_currency": "CNY",
+        "contact": contact,
+        "payment_note": payment_note,
+        "has_contact": bool(contact),
+        "has_payment_note": bool(payment_note),
     }
 
 
@@ -777,6 +878,34 @@ def health() -> Dict[str, Any]:
 @app.get("/api/model-status")
 def get_model_status() -> Dict[str, Any]:
     return model_status()
+
+
+@app.get("/api/business-config")
+def get_business_config() -> Dict[str, Any]:
+    return business_config()
+
+
+@app.post("/api/trial-orders")
+def create_trial_order(payload: TrialOrderCreate) -> Dict[str, Any]:
+    order = save_trial_order(payload)
+    return {"order": order, "business": business_config()}
+
+
+@app.get("/api/trial-orders")
+def list_trial_orders(limit: int = 50) -> Dict[str, Any]:
+    limit = max(1, min(limit, 200))
+    with get_db() as connection:
+        rows = connection.execute(
+            """
+            SELECT id, name, contact, business, platform, material, language,
+                   amount_cents, currency, status, created_at, updated_at
+            FROM trial_orders
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    return {"orders": [row_to_trial_order(row) for row in rows]}
 
 
 @app.post("/api/projects")

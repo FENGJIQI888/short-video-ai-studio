@@ -53,16 +53,20 @@ If the first run is useful, I can turn it into a weekly content pack.
 
 ## Delivery Process
 
-1. Ask the customer for one piece of material and their platform.
-2. Paste the material description into the web app.
-3. Complete the guided questions based on the customer context.
-4. Generate topics.
-5. Pick the strongest topic and generate the script.
-6. Send the customer a clean message with:
+1. Send the customer the sales message or the web page.
+2. Ask them to submit the paid-trial form with contact, platform, and material notes.
+3. Confirm payment manually.
+4. Paste the material description into the creation console.
+5. Complete the guided questions based on the customer context.
+6. Generate topics.
+7. Pick the strongest topic and generate the script.
+8. Send the customer a clean message with:
    - 3 topic titles
    - 1 selected script
    - 5 hooks
    - 1 filming note specific to their business
+
+Trial requests are stored in `data/projects.db` under the `trial_orders` table. You can inspect them with `GET /api/trial-orders` during local testing.
 
 ## Upsell Path
 
@@ -85,4 +89,3 @@ Track these manually at first:
 - Number of customers who upgrade to a monthly package
 
 If fewer than 1 in 20 contacted prospects pays for the sample, revise the offer or choose a narrower customer group.
-

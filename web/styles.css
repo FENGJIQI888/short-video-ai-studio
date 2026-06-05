@@ -377,6 +377,87 @@ h2 {
   content: "";
 }
 
+.trial-panel {
+  margin-bottom: 18px;
+  border: 1px solid var(--line-hot);
+  border-radius: 8px;
+  background:
+    linear-gradient(120deg, rgba(255, 111, 32, 0.12), rgba(255, 155, 66, 0.03)),
+    rgba(17, 17, 17, 0.96);
+  padding: 18px;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
+}
+
+.trial-price {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border: 1px solid rgba(255, 209, 102, 0.34);
+  border-radius: 999px;
+  background: rgba(255, 209, 102, 0.1);
+  color: var(--yellow);
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.trial-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.trial-form input,
+.trial-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #080808;
+  color: var(--ink);
+  padding: 0 12px;
+}
+
+.trial-form input {
+  min-height: 44px;
+}
+
+.trial-form textarea {
+  grid-column: 1 / -1;
+  min-height: 110px;
+  padding-top: 12px;
+}
+
+.trial-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.trial-actions p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.trial-result {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #080808;
+  color: var(--muted);
+  padding: 14px;
+  line-height: 1.65;
+}
+
+.trial-result strong {
+  color: var(--orange-2);
+}
+
+.hidden {
+  display: none;
+}
+
 .command-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
@@ -838,6 +919,7 @@ input:focus {
   }
 
   .console-actions,
+  .trial-actions,
   .panel-title.with-action {
     align-items: stretch;
     flex-direction: column;
@@ -847,11 +929,16 @@ input:focus {
   .upload,
   .jump-link,
   .offer-actions button,
+  .trial-actions button,
   .masthead-actions,
   .language-switch,
   .panel-title button {
     justify-content: center;
     width: 100%;
+  }
+
+  .trial-form {
+    grid-template-columns: 1fr;
   }
 
   .language-switch button {

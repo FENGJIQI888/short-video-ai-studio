@@ -30,6 +30,13 @@
 
 更完整的执行说明见：[Monetization Playbook](docs/monetization-playbook.md)。
 
+如需在首页显示公开联系方式或付款提示，在 `.env` 中配置：
+
+```text
+PUBLIC_CONTACT=微信号或邮箱
+PUBLIC_PAYMENT_NOTE=付款后请备注手机号，并添加微信 xxx 发送素材。
+```
+
 ## Quick Start
 
 ```bash
@@ -118,6 +125,8 @@ uploads/                  用户上传的图片或视频
 output/web_projects/      生成出的脚本、视频配置和封面 brief
 ```
 
+`trial_orders` 也会保存在同一个 SQLite 数据库中，用于记录 `¥20 首单试跑` 的客户联系方式和素材需求。
+
 内测时可以备份这三个目录。正式部署时建议升级为：
 
 - 数据库：Postgres / Supabase / Neon
@@ -130,6 +139,9 @@ output/web_projects/      生成出的脚本、视频配置和封面 brief
 ```text
 GET  /api/health
 GET  /api/model-status
+GET  /api/business-config
+POST /api/trial-orders
+GET  /api/trial-orders
 POST /api/projects
 GET  /api/projects
 GET  /api/projects/{project_id}

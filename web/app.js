@@ -31,6 +31,21 @@ const I18N = {
     "offer.delivery1": "10 分钟内生成初稿",
     "offer.delivery2": "按客户行业补一句拍摄建议",
     "offer.delivery3": "满意后升级 ¥199/月内容包",
+    "trial.kicker": "Paid Trial Intake",
+    "trial.title": "提交首单试跑需求",
+    "trial.price": "首单 ¥20",
+    "trial.name": "你的称呼（可选）",
+    "trial.contact": "微信 / 手机 / 邮箱（必填）",
+    "trial.business": "行业或账号类型，例如：餐饮店 / 美甲 / 探店号",
+    "trial.platform": "发布平台，例如：抖音 / 小红书 / 视频号",
+    "trial.material": "简单描述你的素材和想要的结果，例如：有一段餐厅出餐视频，想做小红书探店内容。",
+    "trial.submit": "提交试跑需求",
+    "trial.submitting": "提交中",
+    "trial.hint": "提交后会生成订单记录，方便人工收款和交付。",
+    "trial.hintContact": "提交后请联系 {contact} 完成付款和素材确认。",
+    "trial.hintPayment": "{payment}",
+    "trial.successTitle": "试跑需求已记录",
+    "trial.successBody": "订单号：{id}。请按提示完成付款，收到素材后即可开始交付。",
     "input.title": "启动创作分析",
     "input.placeholder": "例如：我有一段餐厅出餐的视频，想做成小红书探店内容，重点是环境好、出片、价格适中。",
     "input.upload": "上传图片 / 视频",
@@ -77,6 +92,7 @@ const I18N = {
     "toast.copied": "脚本已复制",
     "toast.noScriptDownload": "还没有脚本可下载",
     "toast.offerCopied": "成交话术已复制",
+    "toast.trialCreated": "试跑需求已提交",
     "thinking.analysisTitle": "正在理解素材",
     "thinking.analysisDone": "素材理解完成",
     "thinking.analysisSteps": ["读取你的文字和上传素材...", "提取可拍摄的内容线索...", "判断适合的短视频表达方向...", "整理下一步需要追问的问题..."],
@@ -136,6 +152,21 @@ const I18N = {
     "offer.delivery1": "Draft the first pass in 10 minutes",
     "offer.delivery2": "Add one industry-specific filming note",
     "offer.delivery3": "Upsell happy clients to a $29/month content pack",
+    "trial.kicker": "Paid Trial Intake",
+    "trial.title": "Submit a first-run request",
+    "trial.price": "$3 first run",
+    "trial.name": "Your name (optional)",
+    "trial.contact": "WeChat / phone / email (required)",
+    "trial.business": "Business or account type, e.g. restaurant / beauty / review account",
+    "trial.platform": "Publishing platform, e.g. TikTok / Reels / Shorts / Xiaohongshu",
+    "trial.material": "Briefly describe your material and desired result.",
+    "trial.submit": "Submit trial request",
+    "trial.submitting": "Submitting",
+    "trial.hint": "The request will be saved for manual payment and delivery.",
+    "trial.hintContact": "After submitting, contact {contact} to confirm payment and material.",
+    "trial.hintPayment": "{payment}",
+    "trial.successTitle": "Trial request saved",
+    "trial.successBody": "Order ID: {id}. Please follow the payment/contact note to start delivery.",
     "input.title": "Start creative analysis",
     "input.placeholder": "Example: I have a restaurant serving video and want to turn it into a Xiaohongshu-style restaurant review focused on atmosphere, visual appeal, and fair pricing.",
     "input.upload": "Upload image / video",
@@ -182,6 +213,7 @@ const I18N = {
     "toast.copied": "Script copied",
     "toast.noScriptDownload": "No script to download yet",
     "toast.offerCopied": "Sales message copied",
+    "toast.trialCreated": "Trial request submitted",
     "thinking.analysisTitle": "Reading material",
     "thinking.analysisDone": "Material read complete",
     "thinking.analysisSteps": ["Reading your text and uploaded material...", "Extracting shootable content clues...", "Evaluating short-video directions...", "Preparing the next guided prompt..."],
@@ -223,6 +255,7 @@ const state = {
   topicCount: 0,
   scriptGenerated: false,
   scriptStatusKey: "script.notGenerated",
+  businessConfig: null,
 };
 
 const el = {
@@ -247,6 +280,15 @@ const el = {
   copyBtn: document.querySelector("#copyBtn"),
   downloadBtn: document.querySelector("#downloadBtn"),
   copyOfferBtn: document.querySelector("#copyOfferBtn"),
+  trialForm: document.querySelector("#trialForm"),
+  trialName: document.querySelector("#trialName"),
+  trialContact: document.querySelector("#trialContact"),
+  trialBusiness: document.querySelector("#trialBusiness"),
+  trialPlatform: document.querySelector("#trialPlatform"),
+  trialMaterial: document.querySelector("#trialMaterial"),
+  trialSubmitBtn: document.querySelector("#trialSubmitBtn"),
+  trialHint: document.querySelector("#trialHint"),
+  trialResult: document.querySelector("#trialResult"),
   toast: document.querySelector("#toast"),
   languageButtons: document.querySelectorAll("[data-lang]"),
 };
@@ -280,6 +322,7 @@ function applyTranslations() {
   if (state.topicsGenerated) {
     el.topicHint.textContent = t("topics.generated", { count: state.topicCount });
   }
+  renderBusinessHint();
   loadModelStatus();
 }
 
@@ -287,6 +330,16 @@ function toast(message) {
   el.toast.textContent = message;
   el.toast.classList.add("show");
   window.setTimeout(() => el.toast.classList.remove("show"), 2400);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[char]);
 }
 
 async function api(path, options = {}) {
@@ -302,6 +355,31 @@ async function api(path, options = {}) {
     throw new Error(message);
   }
   return response.json();
+}
+
+function renderBusinessHint() {
+  const config = state.businessConfig;
+  if (!config || !el.trialHint) {
+    return;
+  }
+  if (config.has_payment_note) {
+    el.trialHint.textContent = t("trial.hintPayment", { payment: config.payment_note });
+    return;
+  }
+  if (config.has_contact) {
+    el.trialHint.textContent = t("trial.hintContact", { contact: config.contact });
+    return;
+  }
+  el.trialHint.textContent = t("trial.hint");
+}
+
+async function loadBusinessConfig() {
+  try {
+    state.businessConfig = await api("/api/business-config");
+    renderBusinessHint();
+  } catch {
+    state.businessConfig = null;
+  }
 }
 
 function setBusy(button, busy, text) {
@@ -504,6 +582,39 @@ async function copyText(text) {
   input.remove();
 }
 
+async function submitTrialOrder(event) {
+  event.preventDefault();
+  try {
+    setBusy(el.trialSubmitBtn, true, t("trial.submitting"));
+    const payload = {
+      name: el.trialName.value.trim(),
+      contact: el.trialContact.value.trim(),
+      business: el.trialBusiness.value.trim(),
+      platform: el.trialPlatform.value.trim(),
+      material: el.trialMaterial.value.trim(),
+      language: state.language,
+    };
+    const result = await api("/api/trial-orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    state.businessConfig = result.business || state.businessConfig;
+    renderBusinessHint();
+    el.trialResult.classList.remove("hidden");
+    el.trialResult.innerHTML = `
+      <strong>${escapeHtml(t("trial.successTitle"))}</strong>
+      <p>${escapeHtml(t("trial.successBody", { id: result.order.id }))}</p>
+    `;
+    el.trialForm.reset();
+    toast(t("toast.trialCreated"));
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    setBusy(el.trialSubmitBtn, false);
+  }
+}
+
 async function createProject() {
   const text = el.idea.value.trim();
   if (!text && state.pendingFiles.length === 0) {
@@ -625,6 +736,7 @@ el.asset.addEventListener("change", () => {
 
 el.startBtn.addEventListener("click", start);
 el.topicBtn.addEventListener("click", generateTopics);
+el.trialForm.addEventListener("submit", submitTrialOrder);
 
 el.copyOfferBtn.addEventListener("click", async () => {
   await copyText(offerMessage());
@@ -655,3 +767,4 @@ el.downloadBtn.addEventListener("click", () => {
 });
 
 applyTranslations();
+loadBusinessConfig();
