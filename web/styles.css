@@ -226,6 +226,10 @@ button:disabled {
   padding: 28px;
 }
 
+.admin-frame .deck {
+  max-width: 1440px;
+}
+
 .masthead {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -260,6 +264,10 @@ h1 {
 h2 {
   margin-bottom: 0;
   font-size: 21px;
+}
+
+.admin-head {
+  min-height: 180px;
 }
 
 .jump-link {
@@ -456,6 +464,93 @@ h2 {
 
 .hidden {
   display: none;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.metric-card,
+.order-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(17, 17, 17, 0.94);
+  padding: 18px;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
+}
+
+.metric-card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 34px;
+  line-height: 1;
+}
+
+.metric-card span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.ops-panel {
+  min-height: 420px;
+}
+
+.orders {
+  display: grid;
+  gap: 12px;
+}
+
+.order-card {
+  display: grid;
+  gap: 12px;
+}
+
+.order-top,
+.order-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.order-top > div,
+.order-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.order-top strong {
+  color: var(--yellow);
+  font-size: 24px;
+}
+
+.order-card h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.order-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.order-actions {
+  justify-content: flex-start;
+}
+
+.order-actions button {
+  border-color: var(--line-hot);
+  background: rgba(255, 111, 32, 0.08);
+  color: var(--orange-2);
+  font-weight: 900;
 }
 
 .command-grid {
@@ -889,6 +984,7 @@ input:focus {
 
   .masthead,
   .offer-strip,
+  .metric-grid,
   .command-grid,
   .workspace-grid {
     grid-template-columns: 1fr;
@@ -929,6 +1025,7 @@ input:focus {
   .upload,
   .jump-link,
   .offer-actions button,
+  .order-actions button,
   .trial-actions button,
   .masthead-actions,
   .language-switch,

@@ -29,6 +29,7 @@
 适合先找餐饮、美业、健身、民宿、探店、带货和本地服务商家。首页已内置“复制成交话术”按钮，可以直接复制给潜在客户。
 
 更完整的执行说明见：[Monetization Playbook](docs/monetization-playbook.md)。
+每日获客流程见：[Daily Sales Routine](docs/daily-sales-routine.md)。
 
 如需在首页显示公开联系方式或付款提示，在 `.env` 中配置：
 
@@ -54,6 +55,12 @@ uvicorn app:app --reload --port 8000
 
 ```text
 http://127.0.0.1:8000
+```
+
+经营面板：
+
+```text
+http://127.0.0.1:8000/admin
 ```
 
 也可以使用 Makefile：
@@ -142,6 +149,8 @@ GET  /api/model-status
 GET  /api/business-config
 POST /api/trial-orders
 GET  /api/trial-orders
+PATCH /api/trial-orders/{order_id}
+GET  /api/revenue-summary
 POST /api/projects
 GET  /api/projects
 GET  /api/projects/{project_id}

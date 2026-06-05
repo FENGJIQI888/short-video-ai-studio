@@ -14,6 +14,7 @@ run:
 check:
 	.venv/bin/python -m py_compile app.py pipeline.py generate_video.py dreamina_batch.py doubao_review.py
 	node --check web/app.js
+	node --check web/admin.js
 
 docker-build:
 	docker build -t short-video-ai-studio .

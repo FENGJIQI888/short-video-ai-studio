@@ -9,7 +9,7 @@ import os
 import shutil
 import sqlite3
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -142,6 +142,10 @@ class TrialOrderCreate(BaseModel):
     language: str = "zh"
 
 
+class TrialOrderUpdate(BaseModel):
+    status: str
+
+
 def normalize_language(language: Optional[str]) -> str:
     return "en" if language == "en" else "zh"
 
@@ -210,12 +214,20 @@ def init_db() -> None:
                 amount_cents INTEGER NOT NULL,
                 currency TEXT NOT NULL,
                 status TEXT NOT NULL,
+                paid_at TEXT,
+                delivered_at TEXT,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL
             )
             """
         )
+        for column, column_type in (("paid_at", "TEXT"), ("delivered_at", "TEXT")):
+            try:
+                connection.execute(f"ALTER TABLE trial_orders ADD COLUMN {column} {column_type}")
+            except sqlite3.OperationalError:
+                pass
         connection.execute("CREATE INDEX IF NOT EXISTS idx_trial_orders_created_at ON trial_orders(created_at)")
+        connection.execute("CREATE INDEX IF NOT EXISTS idx_trial_orders_paid_at ON trial_orders(paid_at)")
 
 
 def migrate_json_projects() -> None:
@@ -307,6 +319,8 @@ def save_trial_order(payload: TrialOrderCreate) -> Dict[str, Any]:
         "amount_cents": 2000,
         "currency": "CNY",
         "status": "new",
+        "paid_at": None,
+        "delivered_at": None,
         "created_at": created_at,
         "updated_at": created_at,
     }
@@ -315,9 +329,9 @@ def save_trial_order(payload: TrialOrderCreate) -> Dict[str, Any]:
             """
             INSERT INTO trial_orders (
                 id, name, contact, business, platform, material, language,
-                amount_cents, currency, status, created_at, updated_at
+                amount_cents, currency, status, paid_at, delivered_at, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 order["id"],
@@ -330,11 +344,48 @@ def save_trial_order(payload: TrialOrderCreate) -> Dict[str, Any]:
                 order["amount_cents"],
                 order["currency"],
                 order["status"],
+                order["paid_at"],
+                order["delivered_at"],
                 order["created_at"],
                 order["updated_at"],
             ),
         )
     return order
+
+
+def update_trial_order_status(order_id: str, status: str) -> Dict[str, Any]:
+    allowed = {"new", "paid", "delivered", "cancelled"}
+    if status not in allowed:
+        raise HTTPException(status_code=400, detail="Invalid order status")
+    updated_at = now_iso()
+    paid_at_clause = ", paid_at = COALESCE(paid_at, ?)" if status in {"paid", "delivered"} else ""
+    delivered_at_clause = ", delivered_at = COALESCE(delivered_at, ?)" if status == "delivered" else ""
+    timestamp_params: List[str] = []
+    if status in {"paid", "delivered"}:
+        timestamp_params.append(updated_at)
+    if status == "delivered":
+        timestamp_params.append(updated_at)
+    with get_db() as connection:
+        connection.execute(
+            f"""
+            UPDATE trial_orders
+            SET status = ?, updated_at = ?{paid_at_clause}{delivered_at_clause}
+            WHERE id = ?
+            """,
+            (status, updated_at, *timestamp_params, order_id),
+        )
+        row = connection.execute(
+            """
+            SELECT id, name, contact, business, platform, material, language,
+                   amount_cents, currency, status, paid_at, delivered_at, created_at, updated_at
+            FROM trial_orders
+            WHERE id = ?
+            """,
+            (order_id,),
+        ).fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Trial order not found")
+    return row_to_trial_order(row)
 
 
 def row_to_trial_order(row: sqlite3.Row) -> Dict[str, Any]:
@@ -349,8 +400,54 @@ def row_to_trial_order(row: sqlite3.Row) -> Dict[str, Any]:
         "amount_cents": row["amount_cents"],
         "currency": row["currency"],
         "status": row["status"],
+        "paid_at": row["paid_at"],
+        "delivered_at": row["delivered_at"],
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
+    }
+
+
+def trial_revenue_summary() -> Dict[str, Any]:
+    today = date.today().isoformat()
+    with get_db() as connection:
+        total_row = connection.execute(
+            """
+            SELECT
+                COUNT(*) AS order_count,
+                COALESCE(SUM(CASE WHEN paid_at IS NOT NULL THEN amount_cents ELSE 0 END), 0) AS revenue_cents,
+                COALESCE(SUM(CASE WHEN status = 'delivered' THEN amount_cents ELSE 0 END), 0) AS delivered_cents
+            FROM trial_orders
+            """
+        ).fetchone()
+        today_row = connection.execute(
+            """
+            SELECT
+                COUNT(*) AS order_count,
+                COALESCE(SUM(CASE WHEN paid_at IS NOT NULL THEN amount_cents ELSE 0 END), 0) AS revenue_cents
+            FROM trial_orders
+            WHERE substr(COALESCE(paid_at, created_at), 1, 10) = ?
+            """,
+            (today,),
+        ).fetchone()
+        status_rows = connection.execute(
+            """
+            SELECT status, COUNT(*) AS count
+            FROM trial_orders
+            GROUP BY status
+            """
+        ).fetchall()
+    daily_goal_cents = 2000
+    today_revenue_cents = int(today_row["revenue_cents"] or 0)
+    return {
+        "date": today,
+        "daily_goal_cents": daily_goal_cents,
+        "today_revenue_cents": today_revenue_cents,
+        "today_goal_met": today_revenue_cents >= daily_goal_cents,
+        "today_order_count": int(today_row["order_count"] or 0),
+        "total_order_count": int(total_row["order_count"] or 0),
+        "total_revenue_cents": int(total_row["revenue_cents"] or 0),
+        "total_delivered_cents": int(total_row["delivered_cents"] or 0),
+        "status_counts": {row["status"]: row["count"] for row in status_rows},
     }
 
 
@@ -870,6 +967,11 @@ def index() -> FileResponse:
     return FileResponse(WEB_DIR / "index.html")
 
 
+@app.get("/admin")
+def admin() -> FileResponse:
+    return FileResponse(WEB_DIR / "admin.html")
+
+
 @app.get("/api/health")
 def health() -> Dict[str, Any]:
     return {"status": "ok", "time": now_iso(), "model": model_status()}
@@ -898,7 +1000,7 @@ def list_trial_orders(limit: int = 50) -> Dict[str, Any]:
         rows = connection.execute(
             """
             SELECT id, name, contact, business, platform, material, language,
-                   amount_cents, currency, status, created_at, updated_at
+                   amount_cents, currency, status, paid_at, delivered_at, created_at, updated_at
             FROM trial_orders
             ORDER BY created_at DESC
             LIMIT ?
@@ -906,6 +1008,16 @@ def list_trial_orders(limit: int = 50) -> Dict[str, Any]:
             (limit,),
         ).fetchall()
     return {"orders": [row_to_trial_order(row) for row in rows]}
+
+
+@app.patch("/api/trial-orders/{order_id}")
+def update_trial_order(order_id: str, payload: TrialOrderUpdate) -> Dict[str, Any]:
+    return {"order": update_trial_order_status(order_id, payload.status)}
+
+
+@app.get("/api/revenue-summary")
+def revenue_summary() -> Dict[str, Any]:
+    return trial_revenue_summary()
 
 
 @app.post("/api/projects")

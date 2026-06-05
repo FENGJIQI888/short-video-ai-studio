@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>经营面板 | 短视频团伙</title>
+    <link rel="stylesheet" href="/web/styles.css" />
+  </head>
+  <body>
+    <div class="app-frame admin-frame">
+      <aside class="rail">
+        <a class="brand" href="/">
+          <span>SV</span>
+          <div>
+            <strong>短视频团伙</strong>
+            <em>Revenue OS</em>
+          </div>
+        </a>
+
+        <nav class="rail-nav" aria-label="经营导航">
+          <a href="/">创作台</a>
+          <a class="active" href="/admin">经营面板</a>
+          <a href="/api/trial-orders" target="_blank" rel="noreferrer">订单 JSON</a>
+          <a href="/api/revenue-summary" target="_blank" rel="noreferrer">收入 JSON</a>
+        </nav>
+
+        <section class="rail-card">
+          <p class="label">Daily Rule</p>
+          <ol class="steps">
+            <li class="active"><span></span><b>找 20 个潜在客户</b></li>
+            <li><span></span><b>卖 ¥20 首单试跑</b></li>
+            <li><span></span><b>标记已付款</b></li>
+            <li><span></span><b>交付并追月费</b></li>
+          </ol>
+        </section>
+      </aside>
+
+      <main class="deck">
+        <section class="masthead admin-head">
+          <div>
+            <p class="label">Revenue Command Center</p>
+            <h1>每天挣 20 块</h1>
+          </div>
+          <div class="masthead-actions">
+            <button id="refreshBtn">刷新</button>
+            <a class="jump-link" href="/">去生成脚本</a>
+          </div>
+        </section>
+
+        <section class="metric-grid" id="metricGrid">
+          <article class="metric-card">
+            <p class="label">Today Revenue</p>
+            <strong id="todayRevenue">¥0</strong>
+            <span id="goalStatus">未达标</span>
+          </article>
+          <article class="metric-card">
+            <p class="label">Daily Goal</p>
+            <strong id="dailyGoal">¥20</strong>
+            <span id="goalGap">还差 ¥20</span>
+          </article>
+          <article class="metric-card">
+            <p class="label">Orders Today</p>
+            <strong id="todayOrders">0</strong>
+            <span>试跑需求</span>
+          </article>
+          <article class="metric-card">
+            <p class="label">Total Orders</p>
+            <strong id="totalOrders">0</strong>
+            <span id="statusCounts">new 0</span>
+          </article>
+        </section>
+
+        <section class="panel ops-panel">
+          <div class="panel-title with-action">
+            <div class="title-row">
+              <span>¥</span>
+              <div>
+                <p class="label">Trial Orders</p>
+                <h2>首单试跑订单</h2>
+              </div>
+            </div>
+            <button id="copyDailyScriptBtn">复制今日获客话术</button>
+          </div>
+
+          <div class="orders" id="orders">
+            <article class="empty-card">
+              <strong>暂无订单</strong>
+              <p>先去找 20 个潜在客户，把首页的试跑入口发出去。</p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="/web/admin.js"></script>
+  </body>
+</html>
